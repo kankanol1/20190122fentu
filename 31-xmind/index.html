@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>高效便捷的引导工具</title>
+<link rel="stylesheet" href="index.css" />
+</head>
+<body>
+<div id="wrap">
+	<div id="box">
+		<div class="item">
+			<div class="content">
+				<div class="text">
+					整个大地都被波涛翻滚的云海所覆盖，云海顺着风由东向西飘逸，白白的，时而突兀、时而低伏，似无边无际的羊群或马群在奔跑。远处的小城被云海吞噬，几处高层的楼房和热电厂的大烟筒矗立在云海之上，如海市蜃楼、又似仙境宫阙。早晨的太阳异常的红亮，给暴露在云海上的楼房镀上了金光，闪闪发亮，这就是天上的“街市”。
+				</div>
+				<div class="del" title="删除">&times;</div>
+			</div>
+			<div class="add" title="添加"></div>
+		</div>
+		<!--<div class="line"></div>-->
+	</div>
+</div>
+<div id="sliderWrap"></div>
+
+<div id="mask">
+	<div id="pop">
+		<h4>请输入内容</h4>
+		<div>
+			<textarea id="t" rows="3"></textarea>
+			<button id="send">发送</button>
+		</div>
+	</div>
+</div>
+
+<div id="centerDot"></div>
+<script src="./tool.js"></script>
+<script>
+	
+//	box的 transform 位移 和 缩放
+	var oriTransX = 0,
+		oriTransY = 0,
+		scaleNum = 1;
+	
+	var wrap = document.getElementById("wrap");
+	var box = document.getElementById("box");
+	var sliderWrap = document.getElementById("sliderWrap");
+	var mask = document.getElementById("mask");
+	var send = document.getElementById("send");
+	var t = document.getElementById("t");
+	var addBtn = null;
+	
+	var windowW = window.innerWidth;
+	var windowH = window.innerHeight;
+	
+	box.style.transformOrigin = `${ windowW/2 }px ${windowH/2}px`;
+	
+	var fn = dealWith( ( v )=>{
+		console.log( v );
+		scaleNum = v;
+		box.style.transform = `translate( ${ oriTransX }px,${ oriTransY }px ) scale(${ scaleNum })`; 
+	},100,200 );
+	
+	var s = slider( {
+		wrap: sliderWrap,
+		max: 2,
+		min: 0.8,
+		val: 1,
+		inputFn: fn,
+		dir: "y"
+	} );
+	
+	send.onclick = function(){
+		mask.style.display = "none";
+		var val = t.value;
+		
+		addBtn.remove();
+		
+		box.innerHTML += `<div class="line"></div><div class="item">
+			<div class="content">
+				<div class="text">
+					${ val }
+				</div>
+				<div class="del" title="删除">&times;</div>
+			</div>
+			<div class="add" title="添加"></div>
+		</div>`;
+		
+		t.value = "";
+	}
+	
+	wrap.onclick = function(){
+//		console.log( 1111 );
+		var tar = event.target; // 触发 该事件的 源
+//		console.log( tar );
+		if( tar.classList.contains( "add" ) ){ // 说明点击 的 是 添加
+			mask.style.display = "flex";
+			addBtn = tar;
+		}else if( tar.classList.contains( "del" ) ){ // 说明点击 的 是删除
+			var item = tar.parentNode.parentNode;
+			var prevLine = item.previousElementSibling;
+			if( prevLine ){
+				prevLine.remove();
+			}else{
+				var nextLine = item.nextElementSibling;
+				if( nextLine ){
+					nextLine.remove();
+				}
+			}
+			item.remove();
+			var lastChild = box.lastElementChild;
+			if( lastChild && !lastChild.querySelector(".add") ){
+				lastChild.innerHTML += `<div class="add" title="添加"></div>`;
+			}
+		}
+	}
+	
+	wrap.ondblclick = function(){
+		// scaleNum 如果 不是 2 就 变成 2,
+//			否则 ,就 变成 0.8
+		if( scaleNum !== 2 ){
+			scaleNum = 2;
+		}else{
+			scaleNum = 0.8;
+		}
+		box.style.transform = `translate( ${ oriTransX }px,${ oriTransY }px ) scale(${ scaleNum })`; 
+		s.setVal( scaleNum );
+	}
+	
+	wrap.onmousedown = function(){
+		var { clientX: oriX, clientY: oriY } = event;
+		var x = oriTransX;
+		var y = oriTransY;
+		box.style.transition = "none";
+		document.onmousemove = function(){
+			var { clientX: nowX, clientY: nowY } = event;
+			
+			x = nowX - oriX + oriTransX;
+			y = nowY - oriY + oriTransY;
+			box.style.transformOrigin = `${ windowW/2-x }px ${windowH/2-y}px`;
+			box.style.transform = `translate( ${x}px,${y}px ) scale(${scaleNum})`;
+		}
+		
+		document.onmouseup = function(){
+			oriTransX = x;
+			oriTransY = y;
+			document.onmousemove = document.onmouseup = null;
+			box.style.transition = ".2s transform linear";
+		}
+		return false;
+	}
+	
+</script>
+</body>
+</html>

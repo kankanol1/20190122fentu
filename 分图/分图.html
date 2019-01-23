@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<script src="js/data.js"></script>
+
+
+<script>
+
+    //添加原型方法
+    Array.prototype.insert = function (index, item) {  this.splice(index, 0, item);  };
+    Array.prototype.sum = function (){
+        return this.reduce(function (partial, value){
+            return partial + value;
+        })
+    };
+
+    //去重
+    function checkData(data){
+        let newData = [];
+        for(let i=0;i<data.length;i++){
+            let flag = 0;
+            for(let j=i+1;j<data.length;j++){
+                if(data[i].id == data[j].id){
+                    flag =1;
+                }
+            }
+            if(flag ==0){
+                newData.push(data[i]);
+            }
+        }
+        return newData;
+    }
+
+    //邻接矩阵
+    function setMatrix(nodes,links){
+        let matrix =[];
+        for(let i=0;i<nodes.length;i++){
+            matrix[i]  = [];
+            for(let j=0;j<nodes.length;j++){
+                matrix[i][j] =0;
+            }
+        }
+        for(let i=0;i<nodes.length;i++){
+            for(let j=0;j<nodes.length;j++){
+                for(let k=0;k<links.length;k++){
+                    if(nodes[i].id==links[k].startNode && nodes[j].id == links[k].endNode){
+                        matrix[i][j] = 1;
+                        matrix[j][i] = 1;
+                    }
+                }
+            }
+        }
+        return matrix;
+
+    }
+    //根据id检测节点索引
+    function checkIndex(id,nodes){
+        for(let i=0;i<nodes.length;i++){
+            if(id == nodes[i].id){
+                return i;
+            }
+        }
+    }
+
+
+    data = data.data;
+    let nodes = checkData(data.nodes);
+    // console.log(nodes);
+    let centerNodes= data.centerNodes;
+    let links= data.links;
+    let matrix = setMatrix(nodes,links);
+    let array = [];
+    for(let i=0;i<centerNodes.length;i++){
+        array[i] = new Set();
+        let flag = checkIndex(centerNodes[i],nodes);
+        array[i].add(flag);
+        for(let j=0;j<nodes.length;j++){
+            if(matrix[flag][j]){
+                array[i].add(j);
+            }
+        }
+    }
+console.log(array);
+
+    function fen(){
+        let arr = [];
+        for(let i=0;i<array.length;i++){
+            // let setA = new Set(array[i-1]);
+            // array[i].forEach((value,key)=> setA.add(value));
+            // console.log(setA);
+            // if((array[i].size + array[i-1].size) == setA.size){
+                // array[i-1]=setA;
+                // array.splice(i,0);
+                // console.log(setA);
+                // console.log((array[i].length+ array[i-1].length) , );
+                // console.log((array[i].length + array[i-1].length),setA.size);
+                // console.log("hah");
+            // }
+
+            let arrN = [];
+            arr[i] = new Set();
+            array[i].forEach((value,key) => arr[i].add(value));
+
+            for(let j=i+1;j<array.length;j++){
+                let setA = new Set(arr[i]);
+                array[j].forEach((value,key)=> setA.add(value));
+                if((arr[i].length + array[j].size) != setA.size){
+                    arrN.push(j);
+                    // console.log(array);
+
+                    array[j].forEach((value,key) => arr[i].add(value));
+                    // array.splice(j,1);
+
+
+                }
+
+            }
+
+            // console.log(arrN);
+
+            for(let k=0;k<arrN.length;k++){
+                array.splice(arrN[arrN.length-1-k],1);
+            }
+
+        }
+        console.log(arr);
+        return arr;
+    }
+
+   fen();
+/*    if( fen()){
+        console.log(array);
+
+    }*/
+
+
+
+
+
+
+
+
+
+
+
+
+    // console.log(matrix);
+//
+
+
+
+
+</script>
+</body>
+</html>
