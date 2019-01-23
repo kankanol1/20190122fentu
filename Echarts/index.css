@@ -1,0 +1,71 @@
+
+
+/*****************************样式的初始化*****************/
+
+
+
+
+div.insert{
+    padding: 10px;
+    border: 1px solid red;
+    border-radius: 10px;
+    background-color: white;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    font-size: 12px;
+    cursor: pointer;
+
+}
+div.insert h4{
+    text-align: center;
+    padding: 10px 0 10px  10px;
+
+}
+div.insert h4 a{
+    padding-left: 10px;
+    font-size: 10px;
+
+}
+div.insert p{
+    font-size: 10px;
+    margin-top: 5px;
+
+}
+div.insert p span{
+    color: gray;
+
+}
+div.pay{
+    padding: 10px;
+    border: 1px solid red;
+    border-radius: 10px;
+    background-color: white;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    font-size: 12px;
+    cursor: pointer;
+    color: #000;!important;
+    opacity: 0.5;!important;
+
+}
+div.pay h4{
+    text-align: center;
+    padding: 10px 0;
+
+}
+div.pay p{
+    font-size: 10px;
+    margin-top: 5px;
+}
+div.pay p span{
+    color: gray;
+}
+#searchId{
+    position: relative;
+    left: 0;
+    top: -800px;
+}

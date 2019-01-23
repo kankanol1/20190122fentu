@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <!--<link rel="stylesheet" href="index.css">-->
+    <style>
+        #main .echarts-tooltip.zr-element{
+            background-color: #ff3d47;!important;
+            /*opacity: 1;!important;*/
+            display: block;!important;
+        }
+
+        div.insert{
+            padding: 10px;
+            border: 1px solid red;
+            border-radius: 5px;
+            background-color: white;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 999;
+            font-size: 12px;
+            cursor: pointer;
+
+        }
+
+        .insert p.titleP{
+            font-size: 14px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .insert a{
+            font-size: 10px;
+            display: block;
+            text-align: right;
+            margin-right: 10px;
+        }
+         p{
+             color: #000;
+            font-size: 10px;
+            margin-top: 5px;
+
+        }
+        p span{
+            color: gray;
+
+        }
+
+    </style>
+</head>
+<body>
+<div id="main" style="width: 1000px; height: 800px;padding-top: 20px;border: 1px solid red;"></div>
+
+<script src="data.js"></script>
+<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+<script>
+
+    //根据id检测节点索引
+    function checkIndex(id,nodes){
+        for(let i=0;i<nodes.length;i++){
+            if(id == nodes[i].id){
+                return nodes[i];
+            }
+        }
+    }
+    //根据id检测节点索引
+    function checkIndexId(id,nodes){
+        for(let i=0;i<nodes.length;i++){
+            if(id == nodes[i].id){
+                return i;
+            }
+        }
+    }
+    //剔除重复数据
+    function checkData(data){
+        let newData = [];
+        for(let i=0;i<data.length;i++){
+            let flag = 0;
+            for(let j=i+1;j<data.length;j++){
+                if(data[i].id == data[j].id){
+                    flag =1;
+                }
+            }
+            if(flag ==0){
+                newData.push(data[i]);
+            }
+        }
+        return newData;
+    }
+
+    /**************************处理数据*****************/
+    var nodes = data.data.nodes;
+    nodes = checkData(nodes);
+    var links = data.data.links;
+    var centerNodes = data.data.centerNodes;
+
+    for(let i=0;i<links.length;i++){
+        links[i].source = links[i].startNode.toString();
+        links[i].target = links[i].endNode.toString();
+    }
+    for(let i=0;i<nodes.length;i++){
+        nodes[i].category=2;
+        nodes[i].name1=nodes[i].name;
+        nodes[i].name=nodes[i].id.toString();
+        nodes[i].label1 = nodes[i].label;
+        nodes[i].label=nodes[i].name1.slice(0,5)+"...";
+        nodes[i].value=2;
+
+    }
+
+    for(let i=0;i<centerNodes;i++){
+        nodes[centerNodes[i]].value = 10;
+        nodes[centerNodes[i]].category = 1;
+    }
+
+    console.log(nodes,links);
+
+    require.config({
+        paths : {
+            echarts : 'http://echarts.baidu.com/build/dist'
+        }
+    });
+    require([ "echarts", "echarts/chart/force","echarts/chart/chord"], function(ec) {
+        option = {
+            title : {
+                text: '德国队效力联盟',
+                x:'right',
+                y:'bottom'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: function (params) {
+                    console.log(params);
+                    if (params.indicator2) {    // is edge
+                        return params.indicator2 + ' ' + params.name + ' ' + params.indicator;
+                    } else {    // is node
+                        return params.name
+                    }
+                }
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    restore : {show: true},
+                    magicType: {show: true, type: ['force', 'chord']},
+                    saveAsImage : {show: true}
+                }
+            },
+            legend: {
+                x: 'left',
+                data:['阿森纳', '拜仁慕尼黑', '多特蒙德']
+            },
+            series : [
+                {
+                    name: '德国队效力联盟',
+                    type:'chord',
+                    sort : 'ascending',
+                    sortSub : 'descending',
+                    ribbonType: false,
+                    radius: '60%',
+                    itemStyle : {
+                        normal : {
+                            label : {
+                                rotate : true
+                            }
+                        }
+                    },
+                    minRadius: 7,
+                    maxRadius: 20,
+                    // 使用 nodes links 表达和弦图
+                    nodes: [
+                        {name:'默特萨克'},
+                        {name:'厄齐尔'},
+                        {name:'波多尔斯基'},
+                        {name:'诺伊尔'},
+                        {name:'博阿滕'},
+                        {name:'施魏因施泰格'},
+                        {name:'拉姆'},
+                        {name:'克罗斯'},
+                        {name:'穆勒', symbol: 'star'},
+                        {name:'格策'},
+                        {name:'胡梅尔斯'},
+                        {name:'魏登费勒'},
+                        {name:'杜尔姆'},
+                        {name:'格罗斯克罗伊茨'},
+                        {name:'阿森纳'},
+                        {name:'拜仁慕尼黑'},
+                        {name:'多特蒙德'}
+                    ],
+                    links: [
+                        {source: '阿森纳', target: '默特萨克', weight: 1, name: '效力'},
+                        {source: '阿森纳', target: '厄齐尔', weight: 1, name: '效力'},
+                        {source: '阿森纳', target: '波多尔斯基', weight: 1, name: '效力'},
+                        {source: '拜仁慕尼黑', target: '诺伊尔', weight: 1, name: '效力'},
+                        {source: '拜仁慕尼黑', target: '博阿滕', weight: 1, name: '效力'},
+                        {source: '拜仁慕尼黑', target: '施魏因施泰格', weight: 1, name: '效力'},
+                        {source: '拜仁慕尼黑', target: '拉姆', weight: 1, name: '效力'},
+                        {source: '拜仁慕尼黑', target: '克罗斯', weight: 1, name: '效力'},
+                        {source: '拜仁慕尼黑', target: '穆勒', weight: 1, name: '效力'},
+                        {source: '拜仁慕尼黑', target: '格策', weight: 1, name: '效力'},
+                        {source: '多特蒙德', target: '胡梅尔斯', weight: 1, name: '效力'},
+                        {source: '多特蒙德', target: '魏登费勒', weight: 1, name: '效力'},
+                        {source: '多特蒙德', target: '杜尔姆', weight: 1, name: '效力'},
+                        {source: '多特蒙德', target: '格罗斯克罗伊茨', weight: 1, name: '效力'}
+                    ]
+                }
+            ]
+        };
+
+        var myChart = ec.init(document.getElementById('main'), 'macarons');
+
+        myChart.setOption(option);
+        var ecConfig = require('echarts/config');
+        function focus(param) {
+            var data = param.data;
+            var links = option.series[0].links;
+            var nodes = option.series[0].nodes;
+            if (
+                data.source !== undefined
+                && data.target !== undefined
+            ) { //点击的是边
+                var sourceNode = nodes.filter(function (n) {
+                    return n.name == data.source
+                })[0];
+                var targetNode = nodes.filter(function (n) {
+                    return n.name == data.target
+                })[0];
+                console.log("选中了边 " + sourceNode.name + ' -> ' + targetNode.name + ' (' + data.weight + ')');
+            } else { // 点击的是点
+                console.log("选中了" + data.name + '(' + data.value + ')');
+            }
+        }
+
+        myChart.on(ecConfig.EVENT.CLICK, focus)
+
+        myChart.on(ecConfig.EVENT.FORCE_LAYOUT_END, function () {
+            console.log(myChart.chart.force.getPosition());
+        });
+
+    });
+
+</script>
+
+
+</body>
+</html>
